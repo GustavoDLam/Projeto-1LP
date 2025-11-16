@@ -1,4 +1,5 @@
 # backend/database.py
+# conexão + helpers genéricos
 import os
 import pyodbc
 from dotenv import load_dotenv
@@ -54,7 +55,14 @@ def execute_query(sql: str, params: tuple | None = None):
             cursor.execute(sql)
         return cursor.fetchall()
 
-# ------------- FUNÇÕES ESPECÍFICAS -------------
+
+
+    sql = "SELECT @@VERSION;"
+    rows = execute_query(sql)
+    print("✅ Conectado ao SQL Server:")
+    print(rows[0][0])
+
+# ------------- TESTE RÁPIDO (opcional) -------------
 
 def test_connection():
     sql = "SELECT @@VERSION;"
@@ -62,48 +70,6 @@ def test_connection():
     print("✅ Conectado ao SQL Server:")
     print(rows[0][0])
 
-def create_table_leads():
-    sql = """
-    IF NOT EXISTS (
-        SELECT * FROM sys.tables WHERE name = 'Leads' AND type = 'U'
-    )
-    BEGIN
-        CREATE TABLE Leads (
-            Id INT IDENTITY(1,1) PRIMARY KEY,
-            Nome NVARCHAR(100) NOT NULL,
-            Email NVARCHAR(200) NOT NULL,
-            Telefone NVARCHAR(20) NULL,
-            DataCadastro DATETIME DEFAULT GETDATE()
-        );
-    END;
-    """
-    execute_non_query(sql)
-
-def insert_lead(nome: str, email: str, telefone: str | None = None):
-    sql = """
-    INSERT INTO Leads (Nome, Email, Telefone)
-    VALUES (?, ?, ?);
-    """
-    params = (nome, email, telefone)
-    execute_non_query(sql, params)
-
-def get_leads():
-    """
-    Retorna todos os leads como lista de tuplas:
-    (Id, Nome, Email, Telefone, DataCadastro)
-    """
-    sql = """
-    SELECT Id, Nome, Email, Telefone, DataCadastro
-    FROM Leads
-    ORDER BY Id DESC;
-    """
-    return execute_query(sql)
-
-# ------------- TESTE RÁPIDO (opcional) -------------
-
 if __name__ == "__main__":
+    # Se rodar "python database.py", só testa a conexão
     test_connection()
-    create_table_leads()
-    print("Tabela Leads verificada/criada com sucesso.")
-    for row in get_leads() or []:
-        print(row)

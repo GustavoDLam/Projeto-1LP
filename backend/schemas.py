@@ -1,3 +1,6 @@
+# backend/schemas.py
+# modelos Pydantic (entrada/saída da API)
+
 from pydantic import BaseModel
 
 class LeadIn(BaseModel):

@@ -1,11 +1,22 @@
-# backend/main.py
+# backend/main.py 
+# rotas FastAPI
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from schemas import LeadIn, LeadOut
-from database import create_table_leads, insert_lead, get_leads
+from crud import create_table_leads, insert_lead, get_leads
 
 app = FastAPI(title="API de Leads da Landing Page")
+
+# --------- CORS PARA DESENVOLVIMENTO ---------
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],       # em produção: restringir
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --------- VALIDAÇÕES SIMPLES ---------
 
