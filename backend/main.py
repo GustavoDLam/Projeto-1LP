@@ -1,25 +1,11 @@
 # backend/main.py
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+
+from schemas import LeadIn, LeadOut
 from database import create_table_leads, insert_lead, get_leads
 
 app = FastAPI(title="API de Leads da Landing Page")
-
-# --------- MODELOS (entrada/saída) ---------
-
-class LeadIn(BaseModel):
-    nome: str
-    email: str
-    telefone: str | None = None
-
-
-class LeadOut(BaseModel):
-    id: int
-    nome: str
-    email: str
-    telefone: str | None = None
-    data_cadastro: str
-
 
 # --------- VALIDAÇÕES SIMPLES ---------
 
