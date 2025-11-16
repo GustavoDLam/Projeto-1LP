@@ -41,7 +41,7 @@ def insert_lead(nome: str, email: str, telefone: str | None = None) -> None:
     execute_non_query(sql, params)
 
 
-def get_leads():
+def get_leads(limit: int = 50, offset: int = 0):
 
     """
     Busca todos os leads.
@@ -52,8 +52,10 @@ def get_leads():
     SELECT Id, Nome, Email, Telefone, DataCadastro
     FROM Leads
     ORDER BY Id DESC;
+    OFFSET ? ROWS
+    FETCH NEXT ? ROWS ONLY;
     """
-    return execute_query(sql)
+    return execute_query(sql, (offset, limit))
 
 
 def get_lead_by_id(lead_id: int):

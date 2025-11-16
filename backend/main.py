@@ -1,10 +1,10 @@
 # backend/main.py 
 # rotas FastAPI
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from schemas import LeadIn, LeadOut
-from crud import create_table_leads, insert_lead, get_leads
+from crud import (create_table_leads, insert_lead, get_leads, get_lead_by_id, delete_lead)
 
 app = FastAPI(title="API de Leads da Landing Page")
 
@@ -67,9 +67,16 @@ def criar_lead(lead: LeadIn):
     return {"message": "Lead cadastrado com sucesso!"}
 
 
-@app.get("/leads", response_model=list[LeadOut])
-def listar_leads():
-    rows = get_leads()
+@app.get("/leads", response_model = list[LeadOut])
+def listar_leads(limit: int = Query(50, gt = 0, le = 100), offset: int = Query(0, ge = 0)):
+
+    """
+    Lista leads com paginação.
+
+    - limit: quantos registros retornar (1 a 100).
+    - offset: a partir de qual posição (0 = desde o início).
+    """
+    rows = get_leads(limit = limit, offset = offset)
     resultado: list[LeadOut] = []
 
     for row in rows:
@@ -85,3 +92,21 @@ def listar_leads():
         )
 
     return resultado
+
+@app.get("/leads/{lead_id}", response_model = LeadOut)
+def obter_lead(lead_id: int = Path(..., gt = 0)):
+    row = get_lead_by_id(lead_id)
+    if not row:
+        raise HTTPException(status_code = 404, detail = "Lead não encontrado")
+    
+    lead_id, nome, email, telefone, data_cad = row
+    return LeadOut(id = lead_id, nome = nome, email = email, telefone = telefone, data_cadastro = str(data_cad))
+
+@app.delete("/leads/{lead_id}")
+def remover_lead(lead_id: int = Path(..., gt = 0)):
+    row = get_lead_by_id(lead_id)
+    if not row:
+        raise HTTPException(status_code = 404, detail = "Lead não encontrado")
+    
+    delete_lead(lead_id)
+    return {"message": f"Lead {lead_id} removido com sucesso" }
