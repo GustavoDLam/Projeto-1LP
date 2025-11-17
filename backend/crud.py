@@ -51,9 +51,8 @@ def get_leads(limit: int = 50, offset: int = 0):
     sql = """
     SELECT Id, Nome, Email, Telefone, DataCadastro
     FROM Leads
-    ORDER BY Id DESC;
-    OFFSET ? ROWS
-    FETCH NEXT ? ROWS ONLY;
+    ORDER BY Id DESC
+    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;
     """
     return execute_query(sql, (offset, limit))
 
