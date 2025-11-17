@@ -1,6 +1,8 @@
 # backend/main.py 
 # rotas FastAPI
-from fastapi import FastAPI, HTTPException, Path, Query
+import os
+
+from fastapi import FastAPI, HTTPException, Path, Query, Depends, Header, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from schemas import LeadIn, LeadOut
@@ -17,6 +19,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
+
+def get_api_key(x_api_key: str = Header(default = None)):
+    """
+    Lê o header X-API-Key e compara com ADMIN_API_KEY do .env.
+    Se não bater, lança 401 (não autorizado).
+    """
+    if ADMIN_API_KEY is None:
+        # Se esquecer de configurar no .env, falha "seguro"
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "ADMIN_API_KEY não condigurada no servidor")
+    
+    if x_api_key is None:
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "X-API-Key não enviado")
+    
+    if x_api_key != ADMIN_API_KEY:
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "API Key inválida")
+    
+    return x_api_key
 
 # --------- VALIDAÇÕES SIMPLES ---------
 
@@ -68,7 +89,7 @@ def criar_lead(lead: LeadIn):
 
 
 @app.get("/leads", response_model = list[LeadOut])
-def listar_leads(limit: int = Query(50, gt = 0, le = 100), offset: int = Query(0, ge = 0)):
+def listar_leads(limit: int = Query(50, gt = 0, le = 100), offset: int = Query(0, ge = 0), api_key: str = Depends(get_api_key)):
 
     """
     Lista leads com paginação.
@@ -94,7 +115,7 @@ def listar_leads(limit: int = Query(50, gt = 0, le = 100), offset: int = Query(0
     return resultado
 
 @app.get("/leads/{lead_id}", response_model = LeadOut)
-def obter_lead(lead_id: int = Path(..., gt = 0)):
+def obter_lead(lead_id: int = Path(..., gt = 0), api_key: str = (Depends(get_api_key))):
     row = get_lead_by_id(lead_id)
     if not row:
         raise HTTPException(status_code = 404, detail = "Lead não encontrado")
@@ -103,7 +124,7 @@ def obter_lead(lead_id: int = Path(..., gt = 0)):
     return LeadOut(id = lead_id, nome = nome, email = email, telefone = telefone, data_cadastro = str(data_cad))
 
 @app.delete("/leads/{lead_id}")
-def remover_lead(lead_id: int = Path(..., gt = 0)):
+def remover_lead(lead_id: int = Path(..., gt = 0), api_key: str = Depends(get_api_key)):
     row = get_lead_by_id(lead_id)
     if not row:
         raise HTTPException(status_code = 404, detail = "Lead não encontrado")
