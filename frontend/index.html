@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cadastro de Leads</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Nosso CSS -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Nosso JS (defer = só roda depois que o HTML carregar) -->
+    <script src="scripts.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Cadastro de Leads</h1>
+    </header>
+
+    <main>
+      <!-- Área de mensagens (erros, sucesso etc.) -->
+      <div id="mensagem" class="mensagem"></div>
+
+      <!-- Formulário -->
+      <section class="card">
+        <h2>Novo lead</h2>
+
+        <form id="lead-form">
+          <div class="campo">
+            <label for="nome">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Digite o nome"
+              required
+            />
+          </div>
+
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="exemplo@dominio.com"
+              required
+            />
+          </div>
+
+          <div class="campo">
+            <label for="telefone">Telefone</label>
+            <input
+              type="text"
+              id="telefone"
+              name="telefone"
+              placeholder="(xx) xxxxx-xxxx"
+              required
+            />
+          </div>
+
+          <button type="submit" id="btn-salvar">Salvar lead</button>
+        </form>
+      </section>
+
+      <!-- Lista de leads -->
+      <section class="card">
+        <div class="lista-header">
+          <h2>Leads cadastrados</h2>
+          <button id="btn-atualizar" type="button">Atualizar lista</button>
+        </div>
+
+        <table id="tabela-leads">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- As linhas serão inseridas via JavaScript -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
