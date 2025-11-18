@@ -12,27 +12,70 @@
     <script src="scripts.js" defer></script>
   </head>
   <body>
+  <div class="page">
     <header>
-      <h1>Cadastro de Leads</h1>
+      <div class="brand">DayTrade Lab</div>
+      <h1>Curso de Day Trade na Prática</h1>
+      <p>
+        Aprenda a operar mini índice e mini dólar com metodologia clara, gestão de risco
+        e acompanhamento passo a passo.</p>
     </header>
 
-    <main>
-      <!-- Área de mensagens (erros, sucesso etc.) -->
-      <div id="mensagem" class="mensagem"></div>
+    <!-- NOVA SECTION HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Do zero ao operacional com disciplina e método</h2>
+        <p>
+          Esse curso foi pensado para quem quer aprender day trade sem promessas
+          milagrosas. Você vai entender contexto, setups, leitura de fluxo e,
+          principalmente, como proteger o seu capital.
+        </p>
+        <ul>
+          <li>📌 Aulas sobre mini índice e mini dólar</li>
+          <li>📊 Estratégias com foco em gestão de risco</li>
+          <li>🧠 Mentalidade, rotina e disciplina de trader</li>
+        </ul>
+      </div>
 
-      <!-- Formulário -->
-      <section class="card">
-        <h2>Novo lead</h2>
+      <div class="hero-media">
+        <!-- EXEMPLO 1: imagem estática -->
+        <img src="https://cmcapital.com.br/wp-content/uploads/2025/08/image-15.png"
+        alt="Gráfico de velas representando operações de day trade" />
+
+        <!-- EXEMPLO 2: vídeo do YouTube (substitua o src pelo seu) -->
+        <div class="video-wrapper">
+          <iframe
+            src=https://www.youtube.com/embed/G7dU85Cx5Qc
+            title="Apresentação da Landing Page"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </section>
+    <!-- FIM HERO -->
+
+    <!-- Mensagens de erro/sucesso -->
+    <div id="mensagem" class="mensagem"></div>
+
+    <main>
+      <!-- Card formulário -->
+      <section class="card card-form">
+        <h2>Inscreva-se para a próxima turma</h2>
+        <p class="form-subtitle">
+          Deixe seus dados para receber o link das aulas, materiais e avisos de novas turmas.
+        </p>
 
         <form id="lead-form">
           <div class="campo">
             <label for="nome">Nome</label>
-            <input
-              type="text"
-              id="nome"
-              name="nome"
-              placeholder="Digite o nome"
-              required
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                placeholder="Digite seu nome completo"
+                required
             />
           </div>
 
@@ -42,13 +85,13 @@
               type="email"
               id="email"
               name="email"
-              placeholder="exemplo@dominio.com"
+              placeholder="seuemail@exemplo.com"
               required
             />
           </div>
 
           <div class="campo">
-            <label for="telefone">Telefone</label>
+            <label for="telefone">Telefone (WhatsApp)</label>
             <input
               type="text"
               id="telefone"
@@ -58,14 +101,17 @@
             />
           </div>
 
-          <button type="submit" id="btn-salvar">Salvar lead</button>
+          <button type="submit" id="btn-salvar">Quero entrar para a lista</button>
         </form>
       </section>
 
-      <!-- Lista de leads -->
-      <section class="card">
+      <!-- Card tabela -->
+      <section class="card card-table">
         <div class="lista-header">
-          <h2>Leads cadastrados</h2>
+          <div>
+            <h2>Lista de interessados</h2>
+            <small id ="contador-leads" class="contador-leads">0 leads</small>
+          </div>
           <button id="btn-atualizar" type="button">Atualizar lista</button>
         </div>
 
@@ -79,10 +125,16 @@
             </tr>
           </thead>
           <tbody>
-            <!-- As linhas serão inseridas via JavaScript -->
+            <!-- preenchido via JS -->
           </tbody>
         </table>
       </section>
     </main>
-  </body>
+
+    <footer>
+      <small>Este é um projeto de estudo: FastAPI, SQL Server e JavaScript aplicados a uma landing page de curso de day trade.</small>
+    </footer>
+  </div>
+</body>
+
 </html>

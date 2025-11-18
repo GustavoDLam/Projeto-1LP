@@ -1,4 +1,25 @@
-/* Resetzinho leve */
+/* =======================
+   VARIÁVEIS DE TEMA
+   ======================= */
+:root {
+  --bg-body: #020617;        /* fundo geral (quase preto / azul bem escuro) */
+  --bg-card: #020617;        /* fundo dos cards */
+  --bg-card-alt: #020617;
+  --border-subtle: #1f2937;
+  --accent: #2563eb;         /* azul do botão */
+  --accent-hover: #1d4ed8;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --table-stripe: #020617;
+  --danger-bg: #1f2933;
+  --danger-text: #fecaca;
+  --success-bg: #022c22;
+  --success-text: #bbf7d0;
+}
+
+/* =======================
+   RESETZINHO
+   ======================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,40 +28,86 @@
     sans-serif;
 }
 
+/* =======================
+   LAYOUT GERAL
+   ======================= */
+
 body {
-  background: #f4f4f4;
+  background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
+  color: var(--text-main);
   padding: 16px;
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 header {
   text-align: center;
   margin-bottom: 24px;
+  padding-top: 16px;
 }
 
+header h1 {
+  font-size: 30px;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+header p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* “Logo” da landing */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.5);
+  background: rgba(15, 23, 42, 0.7);
+}
+
+
 main {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.card {
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
+/* =======================
+   CARDS
+   ======================= */
 
-h1 {
-  font-size: 24px;
-  margin-bottom: 8px;
+.card {
+  background: rgba(15, 23, 42, 0.9);
+  padding: 18px 18px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
 }
 
 h2 {
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
+
+/* =======================
+   FORMULÁRIO
+   ======================= */
 
 .campo {
   display: flex;
@@ -51,30 +118,66 @@ h2 {
 .campo label {
   margin-bottom: 4px;
   font-size: 14px;
+  color: var(--text-muted);
 }
 
 .campo input {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 9px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #020617;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
+.campo input::placeholder {
+  color: #4b5563;
+}
+
+.campo input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  background: #020617;
+}
+
+/* =======================
+   BOTÕES
+   ======================= */
+
 button {
-  padding: 8px 12px;
+  padding: 9px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.15s ease, transform 0.05s ease,
+    box-shadow 0.15s ease;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 #btn-salvar {
-  background: #2563eb;
-  color: white;
+  background: var(--accent);
+  color: #f9fafb;
   width: 100%;
-  font-weight: 600;
+  margin-top: 4px;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
 }
 
-#btn-salvar:hover {
-  background: #1d4ed8;
+#btn-salvar:hover:not(:disabled) {
+  background: var(--accent-hover);
 }
 
 .lista-header {
@@ -84,15 +187,27 @@ button {
   margin-bottom: 8px;
 }
 
+.contador-leads {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 #btn-atualizar {
-  background: #e5e7eb;
+  background: #111827;
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
 }
 
-#btn-atualizar:hover {
-  background: #d1d5db;
+#btn-atualizar:hover:not(:disabled) {
+  background: #1f2937;
 }
 
-/* Tabela */
+/* =======================
+   TABELA
+   ======================= */
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -101,33 +216,181 @@ table {
 
 th,
 td {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-subtle);
   padding: 8px;
   text-align: left;
 }
 
-tbody tr:nth-child(even) {
-  background: #f9fafb;
+th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: rgba(15, 23, 42, 0.9);
 }
 
-/* Mensagens */
+tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.7);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+tbody tr:hover {
+  background: rgba(37, 99, 235, 0.15);
+}
+
+/* =======================
+   MENSAGENS
+   ======================= */
+
 .mensagem {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto 16px auto;
   padding: 8px 12px;
-  border-radius: 4px;
-  display: none;
+  border-radius: 8px;
   font-size: 14px;
+  border: 1px solid transparent;
+  display: none;
 }
 
 .mensagem.ok {
   display: block;
-  background: #dcfce7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: #16a34a;
 }
 
 .mensagem.erro {
   display: block;
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: #ef4444;
+}
+
+/* =======================
+   RESPONSIVIDADE
+   ======================= */
+
+@media (min-width: 768px) {
+  main {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .card-form {
+    flex: 0 0 34%;
+  }
+
+  .card-table {
+    flex: 1;
+  }
+}
+
+footer {
+  margin-top: auto;
+  padding: 16px 0 4px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* =======================
+   HERO (imagem / vídeo)
+   ======================= */
+
+.hero {
+  max-width: 960px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.hero-content {
+  text-align: left;
+}
+
+.hero-content h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.hero-content p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.hero-content ul {
+  list-style: none;
+  padding-left: 0;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.hero-content li {
+  margin-bottom: 4px;
+}
+
+.hero-media {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Imagem da hero */
+.hero-media img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Wrapper para vídeo responsivo */
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Hero lado a lado no desktop */
+@media (min-width: 768px) {
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .hero-content {
+    flex: 1;
+  }
+
+  .hero-media {
+    flex: 1;
+  }
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
 }

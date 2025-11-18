@@ -46,36 +46,65 @@ function mostrarMensagem(texto, tipo) {
  * para a função que desenha a tabela.
  */
 async function carregarLeads() {
-  try {
-    // limpa qualquer mensagem que estivesse na tela
-    mostrarMensagem("", ""); 
+  // pegamos o botão de atualizar (pode ser null se o HTML mudar, então testamos depois)
+  const btnAtualizar = document.getElementById("btn-atualizar");
 
-    // faz a requisição HTTP
+  try {
+    // Se o botão existir, colocamos ele em estado de "carregando"
+    if (btnAtualizar) {
+      btnAtualizar.disabled = true;              // desabilita o clique
+      btnAtualizar.textContent = "Atualizando..."; // muda o texto do botão
+    }
+
+    // Mostra uma mensagem temporária enquanto carrega
+    mostrarMensagem("Carregando leads...", "ok");
+
+    // Faz a requisição GET para /leads
     const resposta = await fetch(`${API_BASE}/leads`, {
-        method: "GET",
-        headers: {
-            "X-API-Key": API_KEY
-        },
+      method: "GET",
+      headers: {
+        // Header com a chave de API que o backend espera
+        "X-API-Key": API_KEY,
+      },
     });
 
-    // só pra debug: ver o status no console
+    // Só pra debug: ver o status da resposta no console (200, 401, etc.)
     console.log("Status GET /leads:", resposta.status);
-    
-    // se NÃO estiver entre 200 e 299, considera erro
+
+    // Se não for status 2xx (200–299), consideramos erro
     if (!resposta.ok) {
+      // Criamos um erro com uma mensagem explicando o status
       throw new Error("Erro ao buscar leads (status " + resposta.status + ")");
     }
-    
-    // converte o corpo da resposta de JSON para objeto/array JS
+
+    // Converte o corpo da resposta de JSON para objeto/array JavaScript
     const dados = await resposta.json();
 
-    // desenha a tabela na tela com esses dados
+    // Debug: ver os dados que chegaram da API
+    console.log("Leads recebidos da API:", dados);
+
+    // Atualiza a tabela na tela com os dados recebidos
     preencherTabela(dados);
+
+    // Como deu certo, limpamos a mensagem (poderia trocar por "Leads atualizados", se quiser)
+    mostrarMensagem("", "");
   } catch (erro) {
+    // Se qualquer coisa der errada lá em cima (fetch, status != 200 etc.), cai aqui
     console.error(erro);
+    // Mostra a mensagem de erro para o usuário
     mostrarMensagem(erro.message || "Erro ao carregar leads", "erro");
+  } finally {
+    // O bloco finally SEMPRE roda, tenha dado erro ou não.
+    // Ótimo lugar para "desfazer" estados de loading.
+
+    if (btnAtualizar) {
+      btnAtualizar.disabled = false;           // reativa o botão
+      btnAtualizar.textContent = "Atualizar lista"; // volta o texto original
+    }
   }
 }
+
+
 
 // =========================================
 // DESENHAR A TABELA DE LEADS
@@ -86,13 +115,21 @@ async function carregarLeads() {
  * Cada lead deve ter: id, nome, email, telefone, data_cadastro.
  */
 function preencherTabela(leads) {
-  // pega o <tbody> da tabela
   const tbody = document.querySelector("#tabela-leads tbody");
-  
-  // apaga qualquer conteúdo anterior
-  tbody.innerHTML = ""; 
-  
-  // se não for array ou estiver vazio, mostra uma linha única
+  tbody.innerHTML = "";
+
+  // Atualiza o contador de leads (texto embaixo do título)
+  const spanContador = document.getElementById("contador-leads");
+  if (spanContador) {
+    const total = Array.isArray(leads) ? leads.length : 0;
+    spanContador.textContent =
+      total === 0
+        ? "Nenhum lead cadastrado"
+        : total === 1
+        ? "1 lead"
+        : `${total} leads`;
+  }
+
   if (!Array.isArray(leads) || leads.length === 0) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
@@ -102,8 +139,7 @@ function preencherTabela(leads) {
     tbody.appendChild(tr);
     return;
   }
-  
-  // para cada lead, criamos uma <tr> com 4 colunas
+
   leads.forEach((lead, index) => {
     const tr = document.createElement("tr");
 
@@ -117,7 +153,7 @@ function preencherTabela(leads) {
     tdEmail.textContent = lead.email;
 
     const tdTelefone = document.createElement("td");
-    tdTelefone.textContent = lead.telefone;
+    tdTelefone.textContent = lead.telefone || "";
 
     tr.appendChild(tdIndex);
     tr.appendChild(tdNome);
@@ -127,6 +163,7 @@ function preencherTabela(leads) {
     tbody.appendChild(tr);
   });
 }
+
 
 // =========================================
 // SALVAR NOVO LEAD (POST /lead)
@@ -138,68 +175,108 @@ function preencherTabela(leads) {
  * recarrega a lista se der tudo certo.
  */
 async function salvarLead(evento) {
-  // impede o comportamento padrão do form (recarregar a página)
-  evento.preventDefault(); 
-  
-  // lê os valores dos inputs
+  // Impede o comportamento padrão do formulário (recarregar a página)
+  evento.preventDefault();
+
+  // Pega os valores dos campos e remove espaços extras nas pontas (trim)
   const nome = document.getElementById("nome").value.trim();
   const email = document.getElementById("email").value.trim();
   const telefone = document.getElementById("telefone").value.trim();
-  
-  // validação bem simples no front
+
+  // Pega o botão de salvar para usar no estado de loading
+  const btnSalvar = document.getElementById("btn-salvar");
+
+  // Validação básica no front: não deixa enviar se tiver campo vazio
   if (!nome || !email || !telefone) {
     mostrarMensagem("Preencha todos os campos.", "erro");
-    return;
+    return; // sai da função, não continua
   }
-  
-  // monta o objeto que o backend espera
+
+  // Monta o objeto que o backend espera no corpo do POST
   const lead = { nome, email, telefone };
 
   try {
+    // Limpa mensagens anteriores
     mostrarMensagem("", "");
-    // faz o POST /lead
+
+    // Coloca o botão em estado de "salvando", se ele existir
+    if (btnSalvar) {
+      btnSalvar.disabled = true;           // desabilita o botão (evita duplo clique)
+      btnSalvar.textContent = "Salvando..."; // muda o texto pra indicar processamento
+    }
+
+    // Faz a requisição POST /lead
     const resposta = await fetch(`${API_BASE}/lead`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": API_KEY,
-        // para o POST não estamos exigindo API_KEY no backend,
-        // mas se você colocar, é só enviar aqui também:
+        "Content-Type": "application/json", // indica que estamos mandando JSON
+        // Se você resolver exigir API_KEY no POST, basta descomentar:
         // "X-API-Key": API_KEY,
       },
-      body: JSON.stringify(lead),
+      body: JSON.stringify(lead), // converte o objeto JS para JSON (string)
     });
 
+    // Debug: ver status do POST
     console.log("Status POST /lead:", resposta.status);
 
-    // se o status for 400 (validação) ou outro erro, cai aqui
+    // Se não for 2xx, tratamos como erro
     if (!resposta.ok) {
-      // tenta ler a mensagem detalhada do backend
+      // Mensagem padrão caso não venha detalhe do backend
       let msgErro = "Erro ao salvar lead (status " + resposta.status + ")";
+
       try {
+        // Tentamos ler o JSON de erro do backend (FastAPI costuma mandar {"detail": "..."} )
         const data = await resposta.json();
         if (data.detail) {
-          msgErro = data.detail;
+          msgErro = data.detail; // se tiver detail, usamos essa mensagem
         }
       } catch (e) {
-        // se não for JSON, ignora
+        // Se a resposta não for JSON, caímos aqui e mantemos a msgErro padrão
       }
+
+      // Lançamos o erro com a mensagem final (vai cair no catch)
       throw new Error(msgErro);
     }
 
-    // se chegou aqui, deu tudo certo no servidor
+    // Se chegou aqui, o backend respondeu 2xx (sucesso)
     mostrarMensagem("Lead salvo com sucesso!", "ok");
 
-    // limpa o formulário
+    // Limpa os campos do formulário
     document.getElementById("lead-form").reset();
 
-    // recarrega a lista de leads para incluir o novo
+    // Recarrega a lista de leads para já mostrar o novo na tabela
     await carregarLeads();
   } catch (erro) {
+    // Qualquer erro durante o try cai aqui
     console.error(erro);
     mostrarMensagem(erro.message || "Erro ao salvar lead", "erro");
+  } finally {
+    // Independente de sucesso ou erro, voltamos o botão ao normal
+    if (btnSalvar) {
+      btnSalvar.disabled = false;             // reativa o botão
+      btnSalvar.textContent = "Salvar lead";  // texto original
+    }
   }
 }
+
+// Formata o telefone no padrão brasileiro simples: (XX) XXXXX-XXXX
+function aplicarMascaraTelefone(valor) {
+  // remove tudo que não for número
+  const numeros = valor.replace(/\D/g, "").slice(0, 11); // limita a 11 dígitos
+
+  if (numeros.length <= 2) {
+    return numeros;
+  }
+
+  if (numeros.length <= 7) {
+    // (XX) XXXX
+    return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+  }
+
+  // (XX) XXXXX-XXXX
+  return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+}
+
 
 // =========================================
 // INICIALIZAÇÃO DA PÁGINA
@@ -218,6 +295,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // botão de atualizar lista
   const btnAtualizar = document.getElementById("btn-atualizar");
   btnAtualizar.addEventListener("click", carregarLeads);
+
+  // Input de telefone com máscara
+  const inputTelefone = document.getElementById("telefone");
+  if (inputTelefone) {
+    inputTelefone.addEventListener("input", (event) => {
+      const valorOriginal = event.target.value;
+      const valorFormatado = aplicarMascaraTelefone(valorOriginal);
+      event.target.value = valorFormatado;
+    });
+  }
 
   // carrega a lista na abertura da página
   carregarLeads();
